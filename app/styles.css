@@ -1,0 +1,22 @@
+body {
+    background-color: #f7f9fc;
+}
+
+h1, h2 {
+    color: #3a3a3a;
+}
+
+.stButton>button {
+    background-color: #4a90e2;
+    color: white;
+    border-radius: 8px;
+    padding: 0.5em 1.5em;
+    font-size: 1em;
+}
+
+.stFileUploader {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    padding: 1em;
+    border-radius: 10px;
+}

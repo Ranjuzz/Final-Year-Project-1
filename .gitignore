@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual Environments
+env/
+venv/
+.venv/
+
+# Streamlit
+.streamlit/
+
+# Model Files
+*.h5
+*.hdf5
+*.ckpt
+model/
+
+# Logs
+*.log
+
+# Jupyter Notebooks Checkpoints
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Python Environment
+seizure_prediction_env/
+
+# System files
+*.swp
