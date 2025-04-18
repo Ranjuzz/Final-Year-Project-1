@@ -1,15 +1,15 @@
 import streamlit as st
-from utils import load_cnn_model, preprocess_image, predict_seizure
+from utils import load_cnn_model, preprocess_image, predict_seizure, is_valid_eeg_image
 
 # Dummy credentials
 USER_CREDENTIALS = {
     "admin": "1234",
-    "user": "123"
+    "user": "1234"
 }
 
 # Load styles
-# with open("app/style.css") as f:
-#     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+with open("app/styles.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Initialize session state
 if "logged_in" not in st.session_state:
@@ -39,12 +39,16 @@ def app_interface():
 
     uploaded_file = st.file_uploader("Choose an image file", type=["jpg", "png", "jpeg"])
     if uploaded_file:
-        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
-        with st.spinner("Predicting..."):
-            model = load_cnn_model()
-            processed_img = preprocess_image(uploaded_file)
-            result = predict_seizure(model, processed_img)
-        st.success(f"Prediction: **{result}**")
+        st.image(uploaded_file, caption="Uploaded Image")
+        
+        if not is_valid_eeg_image(uploaded_file):
+            st.error("⚠️ This doesn't look like a valid EEG image. Please try another file.")
+        else:
+            with st.spinner("Predicting..."):
+                model = load_cnn_model()
+                processed_img = preprocess_image(uploaded_file)
+                result = predict_seizure(model, processed_img)
+            st.success(f"Prediction: **{result}**")
 
     if st.button("Logout"):
         st.session_state.logged_in = False
