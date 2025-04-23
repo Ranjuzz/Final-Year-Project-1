@@ -17,7 +17,7 @@ venv/
 *.h5
 *.hdf5
 *.ckpt
-model/
+# model/
 
 # Logs
 *.log
