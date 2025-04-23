@@ -1,31 +1,35 @@
 from PIL import Image
 import numpy as np
 import tensorflow as tf
+import streamlit as st
+import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 
 def load_cnn_model():
-    model = load_model('model/my_cnn_model.keras')
+    model = load_model('model/model_v2.keras')
     return model
 
-def preprocess_image(image_file):
-    img = Image.open(image_file).convert("L")
-
-    # Resize to (256, 23) — we’ll transpose to (23, 256)
-    img = img.resize((256, 23))
+def predict_from_npz(model, npz_data):
+    if 'test_signals' not in npz_data:
+        raise ValueError("Missing 'test_signals' key in uploaded file.")
     
-    # Convert to numpy array and normalize
-    img_array = np.array(img) / 255.0  # Normalize to [0, 1]
-    
-    # Transpose to (23, 256)
-    img_array = img_array.astype(np.float32)
-    
-    # Add channel dimension -> (23, 256, 1)
-    img_array = img_array[..., np.newaxis]
+    X = npz_data['test_signals']
+    fig, ax = plt.subplots(figsize=(10, 3))
+    ax.plot(X[0].T)
+    ax.set_title("EEG Signal")
+    ax.set_xlabel('Time steps')
+    ax.set_ylabel('Amplitude')
+    ax.grid(True)
+    st.pyplot(fig)
+    X = X[..., np.newaxis]  # Ensure (samples, 23, 256, 1)
+    predictions = model.predict(X)
+    print(predictions)
+    if predictions[0][1] > 0.5:
+        label = "Possiblity of Epilepsy"
+    else:
+        label = "No Possibility"
 
-    # Add batch dimension -> (1, 23, 256, 1)
-    img_array = np.expand_dims(img_array, axis=0) # Add batch dimension
-    return img_array
-
+    return label
 
 def is_valid_eeg_image(image_file) -> bool:
     try:
@@ -45,6 +49,7 @@ def is_valid_eeg_image(image_file) -> bool:
 def predict_seizure(model, image):
     # Simulating a prediction (normally you'd call model.predict here)
     prediction = model.predict(image)
+    print(np.argmax(prediction))
     label = "Seizure" if np.argmax(prediction) == 1 else "No Seizure"
     print("Prediction:", label)
     return label

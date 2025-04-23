@@ -1,5 +1,6 @@
 import streamlit as st
-from utils import load_cnn_model, preprocess_image, predict_seizure, is_valid_eeg_image
+import numpy as np
+from utils import load_cnn_model, predict_from_npz
 
 # Dummy credentials
 USER_CREDENTIALS = {
@@ -34,21 +35,19 @@ def login_form():
                 st.error("Invalid username or password")
 
 def app_interface():
-    st.title("🧠 Seizure Prediction")
-    st.subheader(f"Welcome {st.session_state.username}! \nUpload an image to predict seizure likelihood.")
+    st.title("🧠 Epilepsy Prediction")
+    st.subheader(f"Welcome {st.session_state.username}! \nUpload a `.npz` EEG file for prediction.")
 
-    uploaded_file = st.file_uploader("Choose an image file", type=["jpg", "png", "jpeg"])
+    uploaded_file = st.file_uploader("Choose an EEG file (.npz)", type=["npz"])
     if uploaded_file:
-        st.image(uploaded_file, caption="Uploaded Image")
-        
-        if not is_valid_eeg_image(uploaded_file):
-            st.error("⚠️ This doesn't look like a valid EEG image. Please try another file.")
-        else:
+        try:
             with st.spinner("Predicting..."):
+                npz_data = np.load(uploaded_file)
                 model = load_cnn_model()
-                processed_img = preprocess_image(uploaded_file)
-                result = predict_seizure(model, processed_img)
+                result = predict_from_npz(model, npz_data)
             st.success(f"Prediction: **{result}**")
+        except Exception as e:
+            st.error(f"Error processing EEG file: {e}")
 
     if st.button("Logout"):
         st.session_state.logged_in = False
